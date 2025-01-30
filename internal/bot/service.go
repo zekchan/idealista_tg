@@ -1,6 +1,7 @@
 package bot
 
 import (
+	"regexp"
 	"time"
 
 	"idealista_tg/internal/config"
@@ -10,15 +11,17 @@ import (
 )
 
 type Service struct {
-	bot             *tele.Bot
-	idealistaClient *idealista.Client
-	config          *config.Config
+	bot              *tele.Bot
+	idealistaClient  idealista.Client
+	config           *config.Config
+	idealistaAdRegex *regexp.Regexp
 }
 
-func NewService(cfg *config.Config, client *idealista.Client) *Service {
+func NewService(cfg *config.Config, client idealista.Client) *Service {
 	return &Service{
-		config:          cfg,
-		idealistaClient: client,
+		config:           cfg,
+		idealistaClient:  client,
+		idealistaAdRegex: regexp.MustCompile(`.*/imovel/(\d+).*`),
 	}
 }
 

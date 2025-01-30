@@ -17,7 +17,7 @@ func main() {
 
 	// Initialize services
 	idealistaClient := idealista.NewClient(idealista.ScrapeClientType)
-	botService := bot.NewService(cfg, &idealistaClient)
+	botService := bot.NewService(cfg, idealistaClient)
 	// Start the bot
 	if err := botService.Start(); err != nil {
 		log.Fatal(err)
