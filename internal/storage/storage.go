@@ -5,7 +5,7 @@ import (
 )
 
 type Storage interface {
-	SaveAd(ad *idealista.Ad) error
+	SaveAd(ad *idealista.Ad, author string) error
 	HasAd(id string) (bool, error)
 }
 

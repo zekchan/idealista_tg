@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"idealista_tg/internal/config"
+	"idealista_tg/internal/storage"
 	"idealista_tg/pkg/idealista"
 
 	tele "gopkg.in/telebot.v4"
@@ -15,6 +16,7 @@ type Service struct {
 	idealistaClient  idealista.Client
 	config           *config.Config
 	idealistaAdRegex *regexp.Regexp
+	storage          storage.Storage
 }
 
 func NewService(cfg *config.Config, client idealista.Client) *Service {
@@ -30,7 +32,7 @@ func (s *Service) Start() error {
 		Token:  s.config.BotToken,
 		Poller: &tele.LongPoller{Timeout: 10 * time.Second},
 	}
-
+	s.storage = storage.NewGoogleSheetStorage()
 	bot, err := tele.NewBot(pref)
 	if err != nil {
 		return err

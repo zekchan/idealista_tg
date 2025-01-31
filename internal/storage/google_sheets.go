@@ -16,7 +16,7 @@ type GoogleSheetStorage struct {
 	spreadsheetID string
 }
 
-func (s *GoogleSheetStorage) SaveAd(ad *idealista.Ad) error {
+func (s *GoogleSheetStorage) SaveAd(ad *idealista.Ad, author string) error {
 	call := s.sheetsService.Spreadsheets.Values.Append(s.spreadsheetID, "DATABASE!A:A", &sheets.ValueRange{
 		Values: [][]interface{}{{
 			ad.Id,
@@ -26,6 +26,7 @@ func (s *GoogleSheetStorage) SaveAd(ad *idealista.Ad) error {
 			ad.Area,
 			ad.Rooms,
 			ad.Description,
+			author,
 		}},
 	})
 	call.ValueInputOption("USER_ENTERED")
