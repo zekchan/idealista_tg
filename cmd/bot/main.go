@@ -19,6 +19,7 @@ func main() {
 	idealistaClient := idealista.NewClient(idealista.ScrapeClientType)
 	botService := bot.NewService(cfg, idealistaClient)
 	// Start the bot
+
 	if err := botService.Start(); err != nil {
 		log.Fatal(err)
 	}
