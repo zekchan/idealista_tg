@@ -1,11 +1,12 @@
 package idealista
 
 type Ad struct {
-	Id    string
-	Price int
-	Title string
-	Area  int
-	Rooms int
+	Id          string
+	Price       int
+	Title       string
+	Area        int
+	Rooms       string
+	Description string
 }
 
 type Client interface {

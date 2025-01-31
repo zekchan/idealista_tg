@@ -55,7 +55,7 @@ func getAdTitle(doc *goquery.Document) string {
 
 func getAdArea(doc *goquery.Document) int {
 	area := 0
-	areaText := doc.Find("div.main-info>p.info-data>span>span").First().Text()
+	areaText := doc.Find("div.main-info>p.info-data>span.price-container+span>span").First().Text()
 	areaText = strings.TrimSpace(areaText)
 
 	if areaText != "" {
@@ -64,6 +64,16 @@ func getAdArea(doc *goquery.Document) int {
 		}
 	}
 	return area
+}
+func getAdRooms(doc *goquery.Document) string {
+	roomsText := doc.Find("div.main-info>p.info-data>span.price-container+span+span>span").First().Text()
+	roomsText = strings.TrimSpace(roomsText)
+	return roomsText
+}
+func getAdDescription(doc *goquery.Document) string {
+	description := doc.Find("div.comment>div>p").First().Text()
+	description = strings.TrimSpace(description)
+	return description
 }
 
 func (c *ScrapeClient) GetAd(id string) (Ad, error) {
@@ -75,9 +85,11 @@ func (c *ScrapeClient) GetAd(id string) (Ad, error) {
 	}
 
 	return Ad{Id: id,
-		Price: getAdPrice(doc),
-		Title: getAdTitle(doc),
-		Area:  getAdArea(doc),
+		Price:       getAdPrice(doc),
+		Title:       getAdTitle(doc),
+		Area:        getAdArea(doc),
+		Rooms:       getAdRooms(doc),
+		Description: getAdDescription(doc),
 	}, nil
 }
 
