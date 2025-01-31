@@ -7,7 +7,7 @@ import (
 
 func TestGetAdScrape(t *testing.T) {
 	client := NewClient(ScrapeClientType)
-	ad, err := client.GetAd("33922945")
+	ad, err := client.GetAd("33878574")
 	if err != nil {
 		log.Printf("Error fetching ad: %v", err)
 	} else {

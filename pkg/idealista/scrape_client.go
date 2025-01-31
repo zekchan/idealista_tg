@@ -28,15 +28,7 @@ func getHtml(url string) (io.ReadCloser, error) {
 	}
 	return resp.Body, nil
 }
-
-func (c *ScrapeClient) GetAd(id string) (Ad, error) {
-	htmlReader, err := getHtml(fmt.Sprintf("https://www.idealista.pt/imovel/%s", id))
-	defer htmlReader.Close()
-	doc, err := goquery.NewDocumentFromReader(htmlReader)
-	if err != nil {
-		return Ad{}, err
-	}
-
+func getAdPrice(doc *goquery.Document) int {
 	price := 0
 	priceText := doc.Find("div.info-data>span.info-data-price>span.txt-bold").First().Text()
 	priceText = strings.TrimSpace(priceText)
@@ -52,7 +44,41 @@ func (c *ScrapeClient) GetAd(id string) (Ad, error) {
 		}
 
 	}
-	return Ad{Id: id, Price: price}, nil
+	return price
+}
+
+func getAdTitle(doc *goquery.Document) string {
+	title := doc.Find("head>title").First().Text()
+	title = strings.TrimSpace(title)
+	return title
+}
+
+func getAdArea(doc *goquery.Document) int {
+	area := 0
+	areaText := doc.Find("div.main-info>p.info-data>span>span").First().Text()
+	areaText = strings.TrimSpace(areaText)
+
+	if areaText != "" {
+		if p, err := strconv.Atoi(areaText); err == nil {
+			area = int(p)
+		}
+	}
+	return area
+}
+
+func (c *ScrapeClient) GetAd(id string) (Ad, error) {
+	htmlReader, err := getHtml(fmt.Sprintf("https://www.idealista.pt/imovel/%s", id))
+	defer htmlReader.Close()
+	doc, err := goquery.NewDocumentFromReader(htmlReader)
+	if err != nil {
+		return Ad{}, err
+	}
+
+	return Ad{Id: id,
+		Price: getAdPrice(doc),
+		Title: getAdTitle(doc),
+		Area:  getAdArea(doc),
+	}, nil
 }
 
 var _ Client = (*ScrapeClient)(nil) // Ensure ScrapeClient implements the Client interface
