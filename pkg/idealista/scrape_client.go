@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"regexp"
 	"strconv"
 	"strings"
 
@@ -80,6 +81,22 @@ func getAdDescription(doc *goquery.Document) string {
 	return description
 }
 
+func getAdLocation(doc *goquery.Document) string {
+	locationRegex := regexp.MustCompile(`&center=(.*?)&`)
+	result := "not found"
+	doc.Find("script").EachWithBreak(func(index int, s *goquery.Selection) bool {
+		if locationRegex.MatchString(s.Text()) {
+			location := locationRegex.FindStringSubmatch(s.Text())
+			if len(location) > 1 {
+				result = location[1]
+				return false
+			}
+		}
+		return true
+	})
+	return strings.ReplaceAll(result, "%2C", ";")
+}
+
 func (c *ScrapeClient) GetAd(id string) (Ad, error) {
 	htmlReader, err := getHtml(fmt.Sprintf("https://www.idealista.pt/imovel/%s", id))
 	defer htmlReader.Close()
@@ -95,6 +112,7 @@ func (c *ScrapeClient) GetAd(id string) (Ad, error) {
 		Rooms:       getAdRooms(doc),
 		Description: getAdDescription(doc),
 		ImageURL:    getAdImageURL(doc),
+		Location:    getAdLocation(doc),
 	}, nil
 }
 

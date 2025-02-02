@@ -8,6 +8,7 @@ type Ad struct {
 	Rooms       string
 	Description string
 	ImageURL    string
+	Location    string
 }
 
 type Client interface {

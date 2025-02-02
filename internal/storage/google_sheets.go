@@ -74,6 +74,7 @@ func adToValueRange(ad *idealista.Ad) *sheets.ValueRange {
 			ad.Rooms,
 			ad.Description,
 			ad.ImageURL,
+			ad.Location,
 		}},
 	}
 }
