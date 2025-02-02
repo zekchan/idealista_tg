@@ -6,6 +6,10 @@ build:
 run:
 	go run cmd/bot/main.go
 
+.PHONY: rerun-scrape
+rerun-scrape:
+	go run cmd/bot/main.go rerun-scrape
+
 .PHONY: dev
 dev:
 	air

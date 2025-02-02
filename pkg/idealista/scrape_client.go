@@ -65,6 +65,10 @@ func getAdArea(doc *goquery.Document) int {
 	}
 	return area
 }
+func getAdImageURL(doc *goquery.Document) string {
+	imageURLs := doc.Find("head>meta[property='og:image']").First().AttrOr("content", "")
+	return imageURLs
+}
 func getAdRooms(doc *goquery.Document) string {
 	roomsText := doc.Find("div.main-info>p.info-data>span.price-container+span+span>span").First().Text()
 	roomsText = strings.TrimSpace(roomsText)
@@ -90,6 +94,7 @@ func (c *ScrapeClient) GetAd(id string) (Ad, error) {
 		Area:        getAdArea(doc),
 		Rooms:       getAdRooms(doc),
 		Description: getAdDescription(doc),
+		ImageURL:    getAdImageURL(doc),
 	}, nil
 }
 

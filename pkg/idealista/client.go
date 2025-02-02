@@ -7,6 +7,7 @@ type Ad struct {
 	Area        int
 	Rooms       string
 	Description string
+	ImageURL    string
 }
 
 type Client interface {
