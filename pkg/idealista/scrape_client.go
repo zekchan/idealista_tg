@@ -97,6 +97,12 @@ func getAdLocation(doc *goquery.Document) string {
 	return strings.ReplaceAll(result, "%2C", ";")
 }
 
+func getAdLocationText(doc *goquery.Document) string {
+	locationText := doc.Find("span.main-info__title-minor").First().Text()
+	locationText = strings.TrimSpace(locationText)
+	return locationText
+}
+
 func (c *ScrapeClient) GetAd(id string) (Ad, error) {
 	htmlReader, err := getHtml(fmt.Sprintf("https://www.idealista.pt/imovel/%s", id))
 	defer htmlReader.Close()
@@ -106,13 +112,14 @@ func (c *ScrapeClient) GetAd(id string) (Ad, error) {
 	}
 
 	return Ad{Id: id,
-		Price:       getAdPrice(doc),
-		Title:       getAdTitle(doc),
-		Area:        getAdArea(doc),
-		Rooms:       getAdRooms(doc),
-		Description: getAdDescription(doc),
-		ImageURL:    getAdImageURL(doc),
-		Location:    getAdLocation(doc),
+		Price:        getAdPrice(doc),
+		Title:        getAdTitle(doc),
+		Area:         getAdArea(doc),
+		Rooms:        getAdRooms(doc),
+		Description:  getAdDescription(doc),
+		ImageURL:     getAdImageURL(doc),
+		Location:     getAdLocation(doc),
+		LocationText: getAdLocationText(doc),
 	}, nil
 }
 
