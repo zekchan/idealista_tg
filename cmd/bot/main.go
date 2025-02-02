@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"sync"
 
 	"idealista_tg/internal/bot"
 	"idealista_tg/internal/config"
@@ -34,6 +35,22 @@ func main() {
 	}
 }
 
+// function that runs array of callbacks in parallel
+func runCallbacks(callbacks []func() error) []error {
+	wg := sync.WaitGroup{}
+	errs := make([]error, len(callbacks))
+
+	for i, callback := range callbacks {
+		wg.Add(1)
+		go func(i int, callback func() error) {
+			defer wg.Done()
+			errs[i] = callback()
+		}(i, callback)
+	}
+	wg.Wait()
+	return errs
+}
+
 // new helper function that fetches all ads from storage, re-scrapes them, and prints results
 func rerunScrape(cfg config.Config) {
 	storage := storage.NewGoogleSheetStorage()
@@ -43,14 +60,27 @@ func rerunScrape(cfg config.Config) {
 		return
 	}
 	fmt.Println("Found", len(ads), "ads in storage")
+
 	client := idealista.NewClient(idealista.ScrapeClientType)
+	callbacks := make([]func() error, 0, len(ads))
+
 	for _, ad := range ads {
-		newAd, scrapeErr := client.GetAd(ad.Id)
-		fmt.Println("Scraped ad", newAd)
-		if scrapeErr != nil {
-			log.Printf("Error scraping ad %s: %v", ad.Id, scrapeErr)
-			continue
+		callbacks = append(callbacks, func() error {
+			newAd, scrapeErr := client.GetAd(ad.Id)
+			fmt.Println("Scraped ad", newAd)
+			if scrapeErr != nil {
+				log.Printf("Error scraping ad %s: %v", ad.Id, scrapeErr)
+				return scrapeErr
+			}
+			storage.UpdateAd(&newAd)
+			return nil
+		})
+	}
+
+	errs := runCallbacks(callbacks)
+	for _, err := range errs {
+		if err != nil {
+			log.Printf("%v", err)
 		}
-		storage.UpdateAd(&newAd)
 	}
 }
