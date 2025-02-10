@@ -32,5 +32,3 @@ export GOOGLE_SHEET_CREDENTIALS_FILE=./credentials.json
 - [ ] Add CI/CD
 - [ ] Add monitoring
 - [ ] Add logging
-
-```
