@@ -8,11 +8,34 @@ import (
 
 func (s *Service) registerHandlers() {
 	s.bot.Handle("/start", s.handleStart)
+	s.bot.Handle("/list", s.handleList)
 	s.bot.Handle(tele.OnText, s.handleText)
 }
 
 func (s *Service) handleStart(c tele.Context) error {
 	return c.Send("Hello! I'm your new Telegram bot.")
+}
+
+func (s *Service) handleList(c tele.Context) error {
+	ads, err := s.storage.GetAds()
+	if err != nil {
+		return c.Send("Error retrieving ads: " + err.Error())
+	}
+
+	if len(ads) == 0 {
+		return c.Send("No ads found in storage.")
+	}
+
+	message := "📋 *List of Saved Properties:*\n\n"
+	for i, ad := range ads {
+		adLink := fmt.Sprintf("https://idealista.com/imovel/%s", ad.Id)
+		message += fmt.Sprintf("%d. [Property %s](%s)\n", i+1, ad.Id, adLink)
+	}
+
+	return c.Send(message, &tele.SendOptions{
+		ParseMode:             tele.ModeMarkdown,
+		DisableWebPagePreview: true,
+	})
 }
 
 func (s *Service) handleText(c tele.Context) error {
